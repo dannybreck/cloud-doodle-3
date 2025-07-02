@@ -21,12 +21,12 @@ const getStorageItem = async (key: string): Promise<string | null> => {
 export default function GalleryScreen() {
   const [doodles, setDoodles] = useState<any[]>([]);
   const [refreshing, setRefreshing] = useState(false);
-  const isMountedRef = useRef(true);
+  const [isMounted, setIsMounted] = useState(true);
   const router = useRouter();
 
   // Load doodles from localStorage and merge with mock data
   useEffect(() => {
-    isMountedRef.current = true;
+    setIsMounted(true);
     
     const loadDoodles = async () => {
       try {
@@ -55,7 +55,7 @@ export default function GalleryScreen() {
           const savedDoodles = JSON.parse(savedDoodlesData || '[]');
           
           // Combine all doodles
-          if (isMountedRef.current) {
+          if (isMounted) {
             setDoodles([...transformedDoodles, ...savedDoodles, ...mockDoodles]);
           }
           return;
@@ -68,12 +68,12 @@ export default function GalleryScreen() {
       try {
         const savedDoodlesData = await getStorageItem('userDoodles');
         const savedDoodles = JSON.parse(savedDoodlesData || '[]');
-        if (isMountedRef.current) {
+        if (isMounted) {
           setDoodles([...savedDoodles, ...mockDoodles]);
         }
       } catch (error) {
         console.log('localStorage failed, using mock data:', error);
-        if (isMountedRef.current) {
+        if (isMounted) {
           setDoodles(mockDoodles);
         }
       }
@@ -83,12 +83,12 @@ export default function GalleryScreen() {
     
     // Cleanup function
     return () => {
-      isMountedRef.current = false;
+      setIsMounted(false);
     };
   }, []);
 
   const onRefresh = async () => {
-    if (isMountedRef.current) {
+    if (isMounted) {
       setRefreshing(true);
     }
     
@@ -114,26 +114,26 @@ export default function GalleryScreen() {
         
         const savedDoodlesData = await getStorageItem('userDoodles');
         const savedDoodles = JSON.parse(savedDoodlesData || '[]');
-        if (isMountedRef.current) {
+        if (isMounted) {
           setDoodles([...transformedDoodles, ...savedDoodles, ...mockDoodles]);
         }
       } else {
         const savedDoodlesData = await getStorageItem('userDoodles');
         const savedDoodles = JSON.parse(savedDoodlesData || '[]');
-        if (isMountedRef.current) {
+        if (isMounted) {
           setDoodles([...savedDoodles, ...mockDoodles]);
         }
       }
     } catch (error) {
       const savedDoodlesData = await getStorageItem('userDoodles');
       const savedDoodles = JSON.parse(savedDoodlesData || '[]');
-      if (isMountedRef.current) {
+      if (isMounted) {
         setDoodles([...savedDoodles, ...mockDoodles]);
       }
     }
     
     setTimeout(() => {
-      if (isMountedRef.current) {
+      if (isMounted) {
         setRefreshing(false);
       }
     }, 1500);
